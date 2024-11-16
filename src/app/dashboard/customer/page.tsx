@@ -67,11 +67,15 @@ const CustomerDashboard: React.FC = () => {
       status: 'Pending',
       bookedAt: new Date(),
     };
-
+     
+    console.log('New Ride:', newRide);
+    
     try {
       // Call your backend to book the ride
-      const response = await axios.post('http://localhost:3001/api/rides', newRide);
+      const response = await axios.post('http://localhost:3001/api/ridebooking', newRide);
       console.log('Ride booked successfully:', response.data);
+      const response2 = await axios.post('/api/assinment', {rideId: response.data.ride._id});
+      console.log("Ride assigned successfully:", response2.data);
 
       // After booking, refresh the ride list
       //fetchRides(); // You can re-fetch the rides or add the new ride to the state

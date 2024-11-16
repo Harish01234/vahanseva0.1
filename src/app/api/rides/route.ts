@@ -5,19 +5,26 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const customerId = url.searchParams.get('customerId'); // Get customerId from query params
+    const riderId = url.searchParams.get('riderId'); // Get riderId from query params
 
-    // If no customerId is provided, return an error
-    if (!customerId) {
-      return NextResponse.json({ error: 'Customer ID is required' }, { status: 400 });
+    // If neither customerId nor riderId is provided, return an error
+    if (!customerId && !riderId) {
+      return NextResponse.json(
+        { error: 'At least one of customerId or riderId is required' },
+        { status: 400 }
+      );
     }
 
-    // Log to ensure the customerId is correctly passed
+    // Log to ensure parameters are correctly passed
     console.log('Customer ID received:', customerId);
+    console.log('Rider ID received:', riderId);
 
-    // Build the query to fetch all rides for the given customerId
-    const query = { customerId };
+    // Build the query dynamically based on the provided parameters
+    const query: Record<string, string> = {};
+    if (customerId) query.customerId = customerId;
+    if (riderId) query.riderId = riderId;
 
-    // Fetch all rides for the given customerId
+    // Fetch all rides based on the query
     const allRides = await RideModel.find(query);
 
     // Log the fetched rides to ensure correct data is coming back
@@ -25,8 +32,11 @@ export async function GET(request: NextRequest) {
 
     // Check if rides are found
     if (!allRides || allRides.length === 0) {
-      console.log('No rides found for this customer.');
-      return NextResponse.json({ message: 'No rides found for the customerr' }, { status: 200 });
+      console.log('No rides found for the given parameters.');
+      return NextResponse.json(
+        { message: 'No rides found for the given parameters' },
+        { status: 200 }
+      );
     }
 
     // Return the rides in the response
