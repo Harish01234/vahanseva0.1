@@ -32,7 +32,7 @@ const RiderDashboard: React.FC = () => {
 
     const fetchRides = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/rides?riderId=${riderId}`);
+        const response = await axios.get(`/api/rides?riderId=${riderId}`);
         const rides = response.data.rides || [];
         setRequestedRides(rides.filter((ride: Ride) => ride.status === 'Assigned'));
         setOngoingRides(rides.filter((ride: Ride) => ride.status === 'En Route'));
@@ -56,7 +56,7 @@ const RiderDashboard: React.FC = () => {
     try {
       // Send a request to update the ride state to "En Route"
       const response = await axios.post(
-        `http://localhost:3001/api/ridestate`, 
+        `/api/ridestate`, 
         { rideId, state: 'En Route' }
       );
       console.log('API response:', response.data);
@@ -85,7 +85,7 @@ const RiderDashboard: React.FC = () => {
 
     try {
       // Example cancel ride endpoint
-      await axios.post(`http://localhost:3001/api/ridecancel`, { rideId, riderId });
+      await axios.post(`/api/ridecancel`, { rideId, riderId });
       setRequestedRides((prevRides) => prevRides.filter((ride) => ride._id !== rideId));
     } catch (error) {
       console.error('Error canceling the ride:', error);

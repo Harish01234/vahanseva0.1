@@ -32,7 +32,7 @@ const CustomerDashboard: React.FC = () => {
       console.log('Fetching rides for customer ID:', customerId);
 
       try {
-        const response = await axios.get(`http://localhost:3001/api/rides?customerId=${customerId}`);
+        const response = await axios.get(`/api/rides?customerId=${customerId}`);
         console.log('API response:', response.data);
 
         const rides = response.data.rides || [];
@@ -72,7 +72,7 @@ const CustomerDashboard: React.FC = () => {
     
     try {
       // Call your backend to book the ride
-      const response = await axios.post('http://localhost:3001/api/ridebooking', newRide);
+      const response = await axios.post('/api/ridebooking', newRide);
       console.log('Ride booked successfully:', response.data);
       const response2 = await axios.post('/api/assinment', {rideId: response.data.ride._id});
       console.log("Ride assigned successfully:", response2.data);
