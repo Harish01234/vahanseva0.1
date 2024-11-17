@@ -56,6 +56,12 @@ export async function POST(request: NextRequest) {
             sameSite: 'lax',
         });
 
+        response.cookies.set('role', user.role, {
+            httpOnly: true, // Prevent JavaScript access for security
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+        });
+
         return response;
     } catch (error: any) {
         console.error("Error during login:", error);

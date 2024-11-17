@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import LogoutButton from '@/component/logoutButton';
 
 type Ride = {
   id: string; // Ride ID (ObjectId as a string)
@@ -93,6 +94,9 @@ const CustomerDashboard: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen text-white">
+      {
+        <LogoutButton/>
+      }
       <div className="max-w-7xl mx-auto p-8 sm:p-6 md:p-12">
         <h1 className="text-4xl font-bold text-center mb-8 text-white">Customer Dashboard</h1>
 

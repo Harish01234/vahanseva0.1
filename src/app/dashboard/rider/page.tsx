@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { FaCheck, FaTimes } from 'react-icons/fa'; // Importing icons
+import LogoutButton from '@/component/logoutButton';
 
 type Ride = {
   _id: string; // Ride ID (ObjectId as a string)
@@ -84,8 +85,11 @@ const RiderDashboard: React.FC = () => {
     }
 
     try {
-      // Example cancel ride endpoint
-      await axios.post(`/api/ridecancel`, { rideId, riderId });
+      const response = await axios.post(
+        `/api/ridestate`, 
+        { rideId, state: 'Cancelled' }
+      );
+      console.log('API response:', response.data);
       setRequestedRides((prevRides) => prevRides.filter((ride) => ride._id !== rideId));
     } catch (error) {
       console.error('Error canceling the ride:', error);
@@ -95,6 +99,9 @@ const RiderDashboard: React.FC = () => {
   return (
     <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 min-h-screen text-white">
       <div className="max-w-7xl mx-auto p-8 sm:p-6 md:p-12">
+        {
+          <LogoutButton/>
+        }
         <h1 className="text-4xl font-bold text-center mb-8 text-white">Rider Dashboard</h1>
 
         {/* Requested Rides Section */}
