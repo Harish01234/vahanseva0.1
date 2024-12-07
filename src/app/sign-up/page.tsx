@@ -1,6 +1,8 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import FloatingLabelInput from '@/components/FloatingLabelInput';
 
 interface VehicleDetails {
     type: string;
@@ -10,7 +12,6 @@ interface VehicleDetails {
 
 interface SignupResponse {
     userId: string;
-    // Add any other fields you expect from the response
 }
 
 const Signup = () => {
@@ -18,17 +19,17 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
-    const [role, setRole] = useState('customer'); // Default to customer
-    const [location, setLocation] = useState<[number, number]>([11, 11]); // Default location
+    const [role, setRole] = useState('customer');
+    const [location, setLocation] = useState<[number, number]>([11, 11]);
     const [vehicleDetails, setVehicleDetails] = useState<VehicleDetails>({
         type: '',
         registration_number: '',
         model: '',
     });
-    const [error, setError] = useState(''); // To store error messages
-    const [success, setSuccess] = useState(''); // To store success messages
-    const [loading, setLoading] = useState(false); // Loading state
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const [isLocationAvailable, setIsLocationAvailable] = useState<boolean>(true);
+    const [success, setSuccess] = useState(false); // To handle the success popup visibility
 
     useEffect(() => {
         if (!navigator.geolocation) {
@@ -36,6 +37,20 @@ const Signup = () => {
             setError('Geolocation is not supported by this browser.');
         }
     }, []);
+
+    const resetForm = () => {
+        setName('');
+        setEmail('');
+        setPassword('');
+        setPhone('');
+        setRole('customer');
+        setVehicleDetails({
+            type: '',
+            registration_number: '',
+            model: '',
+        });
+        setLocation([11, 11]);
+    };
 
     const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseFloat(e.target.value);
@@ -64,7 +79,7 @@ const Signup = () => {
                 },
                 (error) => {
                     setError('Unable to retrieve your location. Using default location.');
-                    setLocation([11, 11]); // Default location when location fetch fails
+                    setLocation([11, 11]);
                     console.error(error);
                 },
                 {
@@ -96,7 +111,7 @@ const Signup = () => {
             const response = await axios.post<SignupResponse>('/api/signup', userData);
 
             if (response.status === 201) {
-                setSuccess('Signup successful!');
+                setSuccess(true); // Show success popup
                 console.log(response.data);
             }
         } catch (error: any) {
@@ -112,90 +127,52 @@ const Signup = () => {
             }
         } finally {
             setLoading(false);
-            setName('');
-            setEmail('');
-            setPassword('');
-            setPhone('');
-            setRole('customer');
-            setVehicleDetails({
-                type: '',
-                registration_number: '',
-                model: '',
-            });
+            resetForm(); // Reset the form fields after successful signup
         }
+    };
+
+    const closeSuccessPopup = () => {
+        setSuccess(false); // Close the success popup
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-gray-100">
             {error && (
-                <div className="fixed top-5 left-1/2 transform -translate-x-1/2 w-80 bg-red-600 text-white p-4 rounded-md shadow-lg">
+                <div className="fixed top-5 left-1/2 transform -translate-x-1/2 w-80 bg-red-600 text-white p-4 rounded-md shadow-lg z-50" role="alert" aria-live="assertive">
                     <p className="font-semibold">{error}</p>
                 </div>
             )}
+
+            {/* Success popup */}
             {success && (
-                <div className="fixed top-5 left-1/2 transform -translate-x-1/2 w-80 bg-green-600 text-white p-4 rounded-md shadow-lg">
-                    <p className="font-semibold">{success}</p>
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-green-600 text-white p-6 rounded-lg shadow-lg w-80 text-center">
+                        <h3 className="font-bold text-xl">Signup Successful!</h3>
+                        <button
+                            onClick={closeSuccessPopup}
+                            className="mt-4 px-4 py-2 bg-white text-green-600 rounded-md"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             )}
 
             <div className="bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full">
                 <h2 className="text-3xl font-extrabold text-center mb-6">Sign Up</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="name" className="block text-sm font-medium">Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                            placeholder="Your Name"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                            placeholder="you@example.com"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="password" className="block text-sm font-medium">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                            placeholder="••••••••"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="phone" className="block text-sm font-medium">Phone</label>
-                        <input
-                            type="text"
-                            id="phone"
-                            required
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                            placeholder="Your Phone Number"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="role" className="block text-sm font-medium">Role</label>
+                    <FloatingLabelInput id="name" label="Name" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+                    <FloatingLabelInput id="email" label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    <FloatingLabelInput id="password" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <FloatingLabelInput id="phone" label="Phone" type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+
+                    <div className="relative mb-6">
+                        <label htmlFor="role" className="block text-sm font-medium mb-1">Role</label>
                         <select
                             id="role"
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
+                            className="block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500 text-white"
                         >
                             <option value="customer">Customer</option>
                             <option value="rider">Rider</option>
@@ -204,74 +181,43 @@ const Signup = () => {
 
                     {role === 'rider' && (
                         <>
-                            <div>
-                                <label htmlFor="vehicle_type" className="block text-sm font-medium">Vehicle Type</label>
-                                <input
-                                    type="text"
-                                    id="vehicle_type"
-                                    name="type"
-                                    value={vehicleDetails.type}
-                                    onChange={handleVehicleChange}
-                                    className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                                    placeholder="e.g., Bike, Car"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="registration_number" className="block text-sm font-medium">Registration Number</label>
-                                <input
-                                    type="text"
-                                    id="registration_number"
-                                    name="registration_number"
-                                    value={vehicleDetails.registration_number}
-                                    onChange={handleVehicleChange}
-                                    className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                                    placeholder="Vehicle Registration"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="model" className="block text-sm font-medium">Model</label>
-                                <input
-                                    type="text"
-                                    id="model"
-                                    name="model"
-                                    value={vehicleDetails.model}
-                                    onChange={handleVehicleChange}
-                                    className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                                    placeholder="e.g., Honda Civic"
-                                />
-                            </div>
+                            <FloatingLabelInput
+                                id="vehicle_type"
+                                label="Vehicle Type"
+                                type="text"
+                                value={vehicleDetails.type}
+                                onChange={handleVehicleChange}
+                                name="type"
+                                required
+                            />
+                            <FloatingLabelInput
+                                id="registration_number"
+                                label="Registration Number"
+                                type="text"
+                                value={vehicleDetails.registration_number}
+                                onChange={handleVehicleChange}
+                                name="registration_number"
+                                required
+                            />
+                            <FloatingLabelInput
+                                id="model"
+                                label="Model"
+                                type="text"
+                                value={vehicleDetails.model}
+                                onChange={handleVehicleChange}
+                                name="model"
+                                required
+                            />
                         </>
                     )}
 
-                    <div>
-                        <label htmlFor="latitude" className="block text-sm font-medium">Latitude</label>
-                        <input
-                            type="number"
-                            id="latitude"
-                            name="latitude"
-                            value={location[0]}
-                            onChange={handleLocationChange}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                            placeholder="Latitude"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="longitude" className="block text-sm font-medium">Longitude</label>
-                        <input
-                            type="number"
-                            id="longitude"
-                            name="longitude"
-                            value={location[1]}
-                            onChange={handleLocationChange}
-                            className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md p-3 focus:outline-none focus:ring focus:ring-blue-500"
-                            placeholder="Longitude"
-                        />
-                    </div>
+                    <FloatingLabelInput id="latitude" label="Latitude" type="number" value={location[0].toString()} onChange={handleLocationChange} name="latitude" />
+                    <FloatingLabelInput id="longitude" label="Longitude" type="number" value={location[1].toString()} onChange={handleLocationChange} name="longitude" />
 
                     <button
                         type="button"
                         onClick={getCurrentLocation}
-                        className="w-full py-2 px-4 bg-blue-600 text-white rounded-md focus:outline-none focus:ring focus:ring-blue-500"
+                        className="w-full py-2 px-4 bg-blue-600 text-white rounded-md focus:outline-none focus:ring focus:ring-blue-500 mb-4"
                     >
                         {isLocationAvailable ? 'Fetch Current Location' : 'Default Location Used'}
                     </button>

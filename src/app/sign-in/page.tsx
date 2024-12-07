@@ -2,14 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import FloatingLabelInput from '@/components/FloatingLabelInput'; // Import FloatingLabelInput component
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [user, setUser] = useState<any>(null);  // Local state for user
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const router = useRouter(); // Initialize useRouter
 
-    // Log the updated user state after it changes
     useEffect(() => {
         if (user) {
             console.log("Updated user state:", user);
@@ -49,11 +52,16 @@ const Login = () => {
                 } else {
                     console.error("Unknown role:", role);
                 }
+
+                // Show success message
+                setSuccess('Login successful!');
             }).catch((error) => {
                 console.error("Login failed:", error);
+                setError('Login failed. Please check your credentials.');
             });
         } catch (error) {
             console.error("Login error:", error);
+            setError('An error occurred while logging in.');
         }
 
         // Optionally, reset the form fields
@@ -62,37 +70,40 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-black"> {/* Black background */}
+        <div className="flex items-center justify-center min-h-screen bg-black">
+            {error && (
+                <div className="fixed top-5 left-1/2 transform -translate-x-1/2 w-80 bg-red-600 text-white p-4 rounded-md shadow-lg z-50">
+                    <p className="font-semibold">{error}</p>
+                </div>
+            )}
+            {success && (
+                <div className="fixed top-5 left-1/2 transform -translate-x-1/2 w-80 bg-green-600 text-white p-4 rounded-md shadow-lg z-50">
+                    <p className="font-semibold">{success}</p>
+                </div>
+            )}
+
             <div className="bg-gray-800 rounded-lg shadow-lg p-8 max-w-sm w-full">
                 <h2 className="text-3xl font-bold text-center text-white mb-6">Sign In</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 gap-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-300">Email</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm p-2 bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-500"
-                                placeholder="you@example.com"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-300">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full border border-gray-600 rounded-md shadow-sm p-2 bg-gray-700 text-white focus:outline-none focus:ring focus:ring-blue-500"
-                                placeholder="••••••••"
-                            />
-                        </div>
+                        <FloatingLabelInput
+                            id="email"
+                            label="Email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            placeholder="you@example.com"
+                        />
+                        <FloatingLabelInput
+                            id="password"
+                            label="Password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            placeholder="••••••••"
+                        />
                         <button
                             type="submit"
                             className="mt-4 bg-blue-600 text-white font-bold py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-500"
@@ -102,7 +113,7 @@ const Login = () => {
                     </div>
                 </form>
                 <p className="mt-4 text-center text-sm text-gray-400">
-                    Don&apos;t have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign up</a>
+                    Don&apos;t have an account? <Link href="/sign-up" className="text-blue-500 hover:underline">Sign up</Link>
                 </p>
             </div>
         </div>

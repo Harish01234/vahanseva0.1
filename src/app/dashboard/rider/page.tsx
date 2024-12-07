@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { FaCheck, FaTimes } from 'react-icons/fa'; // Importing icons
-import LogoutButton from '@/component/logoutButton';
+import LogoutButton from '@/components/logoutButton';
 
 type Ride = {
   _id: string; // Ride ID (ObjectId as a string)
