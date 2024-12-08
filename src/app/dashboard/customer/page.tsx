@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import LogoutButton from '@/component/logoutButton';
+import LogoutButton from '@/components/logoutButton';
 
 type Ride = {
   id: string; // Ride ID (ObjectId as a string)
